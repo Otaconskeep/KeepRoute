@@ -4,9 +4,18 @@
 **Designed & Engineered by Antonio G. Garcia (Otaconskeep)**  
 **Powered by [OmniRoute](https://github.com/diegosouzapw/OmniRoute)** (upstream routing data plane)
 
+[![Version](https://img.shields.io/badge/KeepRoute-1.0%20stable-39e6c8.svg)](https://otaconskeep.github.io/keeproute/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-0e5f52.svg)](LICENSE)
+[![Powered by OmniRoute](https://img.shields.io/badge/Powered%20by-OmniRoute-8db3d9.svg)](https://github.com/diegosouzapw/OmniRoute)
+[![Site](https://img.shields.io/badge/Site-otaconskeep.github.io-17202f.svg)](https://otaconskeep.github.io/keeproute/)
+[![YouTube Short](https://img.shields.io/badge/Short-YouTube-ff0000.svg)](https://youtube.com/shorts/Icc8LA7KIzA)
+[![Discord](https://img.shields.io/badge/Discord-Otaconskeep-5865F2.svg)](https://discord.gg/cZDeqECzX)
+
 [![KeepRoute Short](https://img.youtube.com/vi/Icc8LA7KIzA/hqdefault.jpg)](https://youtube.com/shorts/Icc8LA7KIzA)
 
-**[Watch the short](https://youtube.com/shorts/Icc8LA7KIzA)** · **[Live site page](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/)** · **[Discord](https://discord.gg/cZDeqECzX)**
+**[Watch the short](https://youtube.com/shorts/Icc8LA7KIzA)** · **[Canonical site](https://otaconskeep.github.io/keeproute/)** · **[Discord](https://discord.gg/cZDeqECzX)**
+
+![KeepRoute UI tour](docs/assets/keeproute-ui-tour.gif)
 
 ---
 

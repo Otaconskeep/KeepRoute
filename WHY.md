@@ -89,5 +89,5 @@ You → KeepRoute (mission) → OmniRoute (route) → provider/agent
 
 - Install how-to: [INSTALL.md](INSTALL.md)  
 - Full product write-up: [README.md](README.md)  
-- Live page: https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#why  
+- Live page: https://otaconskeep.github.io/keeproute/#why  
 - Short: https://youtube.com/shorts/Icc8LA7KIzA

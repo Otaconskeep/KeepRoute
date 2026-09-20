@@ -12,7 +12,7 @@ This is a **detailed self-install**, not a one-click installer. Follow the steps
 
 The UI alone still lets you ask Auto / providers through OmniRoute. Persistent missions need Mission Controller as well.
 
-Public page with screenshots: https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#install
+Public page with screenshots: https://otaconskeep.github.io/keeproute/#install
 
 ---
 
@@ -63,7 +63,7 @@ Or: GitHub → green **Code** → **Download ZIP** → extract → open the `Kee
 
 ### Option B — from the website zip
 
-1. Open https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#install  
+1. Open https://otaconskeep.github.io/keeproute/#install  
 2. Download **KeepRoute-UI.zip**  
 3. Unzip somewhere permanent:
 
@@ -257,7 +257,7 @@ Always bind to **127.0.0.1** unless you know why you are exposing something on t
 | Wrong OmniRoute port | Desk default in code is `20128`; **our compose uses host `20127`** — always export `OMNIROUTE_HOST` as shown above |
 | Password / login issues on OmniRoute | Reset via upstream OmniRoute docs; set a strong `OMNIROUTE_INITIAL_PASSWORD` before first boot |
 
-Still stuck? [Discord](https://discord.gg/cZDeqECzX) · site FAQ: https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#faq
+Still stuck? [Discord](https://discord.gg/cZDeqECzX) · site FAQ: https://otaconskeep.github.io/keeproute/#faq
 
 ---
 
@@ -272,6 +272,6 @@ Still stuck? [Discord](https://discord.gg/cZDeqECzX) · site FAQ: https://otacon
 
 ## Next
 
-- Product story + UI screenshots: https://otaconskeep-site.otaconskeep.workers.dev/keeproute/  
+- Product story + UI screenshots: https://otaconskeep.github.io/keeproute/  
 - Why we built it: [WHY.md](WHY.md)  
 - Main write-up: [README.md](README.md)
