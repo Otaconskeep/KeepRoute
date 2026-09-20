@@ -4,48 +4,83 @@
 **Designed & Engineered by Antonio G. Garcia (Otaconskeep)**  
 **Powered by [OmniRoute](https://github.com/diegosouzapw/OmniRoute)** (upstream routing data plane)
 
-[![KeepRoute Short](https://img.youtube.com/vi/Icc8LA7KIzA/maxresdefault.jpg)](https://youtube.com/shorts/Icc8LA7KIzA)
+[![KeepRoute Short](https://img.youtube.com/vi/Icc8LA7KIzA/hqdefault.jpg)](https://youtube.com/shorts/Icc8LA7KIzA)
 
-**[Watch the KeepRoute short on YouTube](https://youtube.com/shorts/Icc8LA7KIzA)** · **[Public page](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/)** · **[Discord](https://discord.gg/cZDeqECzX)**
+**[Watch the short](https://youtube.com/shorts/Icc8LA7KIzA)** · **[Live site page](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/)** · **[Discord](https://discord.gg/cZDeqECzX)**
 
 ---
 
-## What this is
+## Start here (no experience required)
+
+| Step | Do this |
+|---|---|
+| 1 | Read **[What is KeepRoute?](#what-is-keeproute)** (2 minutes) |
+| 2 | Read **[OmniRoute vs KeepRoute](#omniroute-vs-keeproute)** so you know why this exists |
+| 3 | Follow **[INSTALL.md](INSTALL.md)** — full how-to on your own computer |
+| 4 | Optional: skim **[WHY.md](WHY.md)** and the [capability table](#capability-comparison-not-a-scoreboard) |
+
+This repo includes the **KeepRoute field UI package** under [`KeepRoute-UI/`](KeepRoute-UI/) so you can install from GitHub (clone or Download ZIP), not only from the website.
+
+```bash
+git clone https://github.com/Otaconskeep/KeepRoute.git
+cd KeepRoute
+# then open INSTALL.md and follow it in order
+```
+
+---
+
+## What is KeepRoute?
 
 **OmniRoute routes a request. KeepRoute owns the mission.**
 
-[OmniRoute](https://github.com/diegosouzapw/OmniRoute) is an excellent upstream gateway: one API in, pick among providers/models, fall back when something is unhealthy. KeepRoute does **not** replace that. KeepRoute is OtaconsKeep’s layer **on top** of OmniRoute — mission control for long agent work.
+[OmniRoute](https://github.com/diegosouzapw/OmniRoute) is an excellent upstream gateway:
 
-When Claude hits a limit, a provider fails, Cursor stalls, or the host reboots, stock routing can send the *next* prompt somewhere else. The human still has to rebuild what finished, what failed, and what not to do twice. KeepRoute exists so the **job itself** has an ID, checkpoints, remaining work, and a path to continue on another supported agent.
+- one API in
+- many providers / models out
+- fallback when something is unhealthy
+- health / combos / resilience
+
+KeepRoute does **not** replace OmniRoute. KeepRoute is OtaconsKeep’s layer **on top**:
+
+- the **job** gets a Mission ID
+- progress can be **checkpointed**
+- if Claude hits a limit, a provider fails, Cursor stalls, or the host reboots, KeepRoute can **continue the same mission** on another supported path instead of making you rebuild context by hand
 
 > **The mission is the product. The model is replaceable.**
+
+### Ten-second version
+
+| Product | Job |
+|---|---|
+| **OmniRoute** | Chooses *where this request goes* among providers and models |
+| **KeepRoute** | Owns *the whole job* — watches it, checkpoints it, continues it if the AI has to change |
+
+### What you install
+
+1. **OmniRoute** (Docker) — routing engine / data plane  
+2. **KeepRoute UI** (Python/Flask) — the field screen: providers on the left, ask box on the right  
+3. **Optional: Mission Controller** — full KeepRoute 1.0 mission policy, checkpoints, handoff (UI works with OmniRoute alone for basic Auto chat)
+
+---
 
 ## Why it was made
 
 People already had a great way to send chat to many AIs. What kept breaking real Keep workflows was not “pick a model” — it was **losing the job** when that model hit a wall.
 
-| | OmniRoute (upstream) | KeepRoute (OtaconsKeep) |
-|---|---|---|
-| Job | Route this request | Finish this mission |
-| Unit of work | Prompt / response | Mission ID + state |
-| On failure | Provider / model fallback | Checkpoint → continue / handoff |
-| Ownership | Traffic director | Mission control |
+A coding session would be halfway done. Claude hit quota. Or Cursor stalled. Or the host rebooted. Stock routing can send the *next* prompt somewhere else — but the human still had to rebuild: what finished, what failed, what files mattered, what not to do twice.
 
-KeepRoute uses OmniRoute underneath for provider/model routing. Without KeepRoute you still have excellent fallback between models. With KeepRoute the mission can survive recoverable failure.
+### What we refused to accept
 
-## What KeepRoute adds (1.0)
+- Trivial “hi” burning paid tokens  
+- Every client inventing its own routing rules  
+- Starting over after a recoverable failure  
+- Replaying a destructive step because the new agent did not know it already ran  
 
-- Persistent **Mission ID** and mission state
-- **Checkpoints** and completed / remaining work tracking
-- Recoverable failover with mission-aware continuation
-- Supported **cross-agent handoff** (e.g. Claude Code → Codex paths tested in release)
-- Service restart and full-host reboot recovery (verified in KeepRoute 1.0 testing)
-- Policy-enforced **local-first** routing for trivial work (avoid burning paid tokens on “hi”)
-- Field UI (“KeepRoute desk”) for operators
+Longer write-up: **[WHY.md](WHY.md)**
 
-We do **not** claim stock OmniRoute is bad. Capability comparison (not a scoreboard) lives on the [public KeepRoute page](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#compare).
+---
 
-## Relationship to OmniRoute
+## OmniRoute vs KeepRoute
 
 ```
 OtaconsKeep
@@ -53,26 +88,141 @@ OtaconsKeep
         └── OmniRoute    ← upstream provider/model routing (open source)
 ```
 
-- Upstream OmniRoute remains its own project: [diegosouzapw/OmniRoute](https://github.com/diegosouzapw/OmniRoute)
-- KeepRoute is **not** “our OmniRoute fork” and is **not** stock OmniRoute
-- KeepRoute is the OtaconsKeep orchestration / control plane built around OmniRoute
+| | OmniRoute (upstream) | KeepRoute (OtaconsKeep) |
+|---|---|---|
+| Made for | “Send this chat to the right model.” | “Finish this mission even if the model has to change.” |
+| Unit of work | Prompt / response | Mission ID + state |
+| On failure | Provider / model fallback | Checkpoint → continue / handoff |
+| Ownership | Traffic director | Mission control |
 
-## Install / try it
+- Upstream OmniRoute: [diegosouzapw/OmniRoute](https://github.com/diegosouzapw/OmniRoute)  
+- KeepRoute is **not** “our OmniRoute fork” and is **not** stock OmniRoute  
+- You should use OmniRoute — KeepRoute does  
 
-Self-install (detailed, not one-click) is documented on the public site:
+### Capability comparison (not a scoreboard)
 
-1. Open **[keeproute → Install](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#install)**
-2. Download **KeepRoute-UI.zip**
-3. Follow the steps for OmniRoute + the KeepRoute desk UI
+We do **not** claim stock OmniRoute is bad. Where stock has no mission-orchestration equivalent, we say so plainly.
 
-Release status, sanitized benchmarks, security notes, pros/cons, and FAQ are on that same page.
+| Capability | Stock OmniRoute | KeepRoute 1.0 |
+|---|---|---|
+| Multiple providers / models | Yes | Uses OmniRoute |
+| Provider / model routing | Yes | Uses OmniRoute |
+| Provider fallback / combos | Yes | Uses OmniRoute + mission-aware recovery |
+| Health / circuit handling | Yes | Uses OmniRoute resilience + KeepRoute supervision |
+| Policy-based task classification | Not KeepRoute-style mission policy | Yes |
+| Persistent Mission ID | No equivalent mission layer | Yes |
+| Persistent mission state | No equivalent mission layer | Yes |
+| Checkpoints | Not core stock routing | Yes |
+| Completed / remaining work tracking | No equivalent | Yes |
+| Unresolved-error preservation | No equivalent | Yes |
+| Route history (mission-level) | Request/usage telemetry ≠ mission history | Yes |
+| Service restart recovery | No mission-level equivalent | Yes (tested) |
+| Full-host reboot recovery | No mission-level equivalent | Yes (verified 2/2 in KeepRoute testing) |
+| Stateful model continuation | Fallback ≠ mission continuation package | Yes |
+| Cross-agent runtime handoff | No | Yes, supported/tested paths |
+| Claude Code → Codex continuation | No | Yes, supported/tested path |
+| Multi-hop continuation | No mission multi-hop | Yes |
+| Duplicate / destructive action protection | No mission ledger equivalent | Yes |
+| Local-first trivial routing | Configurable routing | Policy-enforced local-first for trivial work |
+| Operational mission metrics / release gate | Gateway monitoring | Mission soak metrics + release verification |
 
-## Watch
+More visuals + UI screenshots: [keeproute/#compare](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#compare) · [keeproute/#ui](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#ui)
 
-- Short: https://youtube.com/shorts/Icc8LA7KIzA  
-- Embedded next to the “why” write-up: https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#watch
+---
 
-## Release
+## How it works (concept)
+
+```
+You describe a job
+        ↓
+KeepRoute Mission Controller (when running)
+        ↓ policy + classification
+OmniRoute (data plane) → Claude / Codex / Cursor / Grok / Local
+        ↓
+If failure → checkpoint → handoff / continue
+        ↓
+Mission complete
+```
+
+- **Auto** is the normal path: policy picks the route  
+- You can force a provider when you want to  
+- Cloud providers only see what that mission needs — not “everything on your disk”  
+
+---
+
+## Install KeepRoute on your computer
+
+**Full step-by-step (recommended):** → **[INSTALL.md](INSTALL.md)**
+
+Quick outline:
+
+1. **Requirements:** Linux (or Windows WSL2 Ubuntu), Python 3.10+, Docker, pip. GPU optional (Local AI).  
+2. **Get this package** — clone this repo or unzip from the [site download](https://otaconskeep-site.otaconskeep.workers.dev/downloads/KeepRoute-UI.zip).  
+3. **Start OmniRoute** with Docker (`KeepRoute-UI/docker-compose.omniroute.yml`).  
+4. **Start KeepRoute UI** (`python3 desk/app.py` → `http://127.0.0.1:20129/`).  
+5. **Add providers / keys** inside the UI (never paste keys into Discord or GitHub).  
+6. **Test:** `Hi` with Auto, then a small coding ask.  
+7. **Optional:** Mission Controller for full 1.0 mission policy (`MISSION_CONTROLLER_URL`).
+
+This is a **detailed self-install**, not a one-click installer. Packaging polish for one-click remains in progress.
+
+---
+
+## Using the UI (after install)
+
+1. Open `http://127.0.0.1:20129/`  
+2. Click **ADD PROVIDERS** — connect OmniRoute API key (+ Claude / Codex / Cursor / Grok / Local as you want) — **SAVE KEYS**  
+3. Leave **Auto** selected  
+4. Type plain words → **GO**  
+5. Status lights: green = connected; Routed = used on the last job  
+
+### Provider cheat sheet
+
+| Provider | Notes |
+|---|---|
+| OmniRoute API key | Usually enough for Auto — create/copy inside OmniRoute dashboard |
+| Claude | Cloud · usually paid — connect in OmniRoute first |
+| Codex / OpenAI | Cloud · usually paid |
+| Cursor | Optional coding agent runtime |
+| Grok | Optional cloud |
+| Local AI | Ollama (or similar) via OmniRoute — no GPU? skip Local, use cloud |
+
+### Example “ready” screen
+
+```
+KeepRoute UI: http://127.0.0.1:20129/
+OmniRoute: Connected
+Local AI: Connected
+Claude: Connected
+Codex: Connected
+Cursor: Not configured
+Grok: Not configured
+
+Routing: Ready
+→ OPEN KEEPROUTE
+```
+
+---
+
+## Ports (default, loopback)
+
+| Service | URL on your machine |
+|---|---|
+| OmniRoute (via our compose file) | `http://127.0.0.1:20127` |
+| KeepRoute UI | `http://127.0.0.1:20129` |
+| Mission Controller (optional) | `http://127.0.0.1:20130` |
+
+Compose maps host **20127** → container internal **20128**. Always set:
+
+```bash
+export OMNIROUTE_HOST=http://127.0.0.1:20127
+```
+
+when using the compose file in this repo.
+
+---
+
+## Release 1.0 (what shipped)
 
 | Field | Value |
 |---|---|
@@ -82,23 +232,80 @@ Release status, sanitized benchmarks, security notes, pros/cons, and FAQ are on 
 | Data plane | OmniRoute (upstream) |
 | Builder | OtaconsKeep / Antonio G. Garcia |
 
-## What this repo is
+**Friendly changelog:** First stable release of mission orchestration — persistent missions, checkpoints, recovery, local-first trivial policy, supported agent handoff, and release-verified soak results.
 
-This repository is the **public write-up and product home** for KeepRoute 1.0:
+Sanitized benchmarks, security notes, pros/cons, and limitations:  
+https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#benchmarks
 
-- What it is and why it exists
-- How it differs from OmniRoute
-- Links to the live page, short, Discord, and install path
+### Honest limits
 
-Full field deployment, Mission Controller internals, and operator evidence packs live with the OtaconsKeep reference deployment — not as a claim that “clone this repo and you have production Keep.” Use the [public install page](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#install) for the supported self-install path.
+- No AI system is guaranteed to finish every task  
+- A replacement agent cannot inherit another provider’s private hidden reasoning  
+- Handoff uses provider-independent mission state (files, decisions, errors, TODOs, tool results, checkpoints)  
+- Cloud usage can cost money; outages can exhaust all routes — mission should stop cleanly, not fake success  
+- Checkpoints reduce risk; they are not a substitute for backups  
+- Benchmarks are release-test results, not universal guarantees  
+
+---
+
+## FAQ
+
+**Why does KeepRoute exist if OmniRoute already routes?**  
+OmniRoute routes a request. KeepRoute owns the mission. Long agent jobs kept dying when a single provider failed; KeepRoute checkpoints and continues so you are not rebuilding by hand.
+
+**Is this stock OmniRoute?**  
+No. OmniRoute is the data plane. KeepRoute is the mission / orchestration layer on top.
+
+**Did you fork OmniRoute?**  
+No. Upstream OmniRoute remains its own project. KeepRoute is OtaconsKeep’s layer around it.
+
+**What happens when Claude reaches its limit?**  
+KeepRoute can checkpoint and continue on another eligible provider/agent when the path is supported — not the same as blindly retrying the same prompt.
+
+**Can it use Cursor?**  
+Yes, as a supported agent adapter path when configured.
+
+**Can I run everything locally?**  
+Simple work can stay local. Heavy coding may still need cloud providers depending on hardware/models.
+
+**Are my API keys public?**  
+No. Keys stay on your machine inside KeepRoute / OmniRoute. Never paste them into Discord, email, issues, or this README.
+
+**Does it guarantee every mission completes?**  
+No. Release tests showed strong results in measured samples; not a universal guarantee.
+
+**What if my computer restarts?**  
+Supported missions can recover from checkpoints after reboot (verified 2/2 host-reboot tests in the 1.0 release set) when Mission Controller / full orchestration is in use.
+
+---
+
+## Repo layout
+
+```
+KeepRoute/
+  README.md                 ← you are here
+  WHY.md                    ← why we built it
+  INSTALL.md                ← full how-to
+  LICENSE
+  KeepRoute-UI/             ← field UI + OmniRoute compose companion
+    README.txt
+    docker-compose.omniroute.yml
+    keeproute-ui.service.example
+    desk/                   ← Flask UI (app.py, static, templates)
+```
+
+---
 
 ## Links
 
-- Site: https://otaconskeep-site.otaconskeep.workers.dev/keeproute/
-- Org: https://github.com/Otaconskeep
-- Otacon Core: https://github.com/Otaconskeep/otacons-ai-ecosystem
-- OmniRoute (upstream): https://github.com/diegosouzapw/OmniRoute
-- Discord: https://discord.gg/cZDeqECzX
+| | |
+|---|---|
+| This repo | https://github.com/Otaconskeep/KeepRoute |
+| Public page | https://otaconskeep-site.otaconskeep.workers.dev/keeproute/ |
+| YouTube Short | https://youtube.com/shorts/Icc8LA7KIzA |
+| OmniRoute upstream | https://github.com/diegosouzapw/OmniRoute |
+| Otacon Core | https://github.com/Otaconskeep/otacons-ai-ecosystem |
+| Discord | https://discord.gg/cZDeqECzX |
 
 ---
 
