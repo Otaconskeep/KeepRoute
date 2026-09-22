@@ -254,7 +254,7 @@ Always bind to **127.0.0.1** unless you know why you are exposing something on t
 | “Connection refused” to OmniRoute | `docker ps \| grep omniroute` — if empty, re-run compose `up -d`. Confirm `OMNIROUTE_HOST=http://127.0.0.1:20127` |
 | Docker permission errors | Install Docker Engine, add your user to the `docker` group, log out/in, retry |
 | Local AI silent | No GPU / no Ollama is fine — use cloud only; Local is optional |
-| Wrong OmniRoute port | Desk default in code is `20128`; **our compose uses host `20127`** — always export `OMNIROUTE_HOST` as shown above |
+| Wrong OmniRoute port | Desk default is host `20127` (compose publish). Container-internal remains `20128`. Set `OMNIROUTE_HOST` if you remapped ports |
 | Password / login issues on OmniRoute | Reset via upstream OmniRoute docs; set a strong `OMNIROUTE_INITIAL_PASSWORD` before first boot |
 
 Still stuck? [Discord](https://discord.gg/cZDeqECzX) · site FAQ: https://otaconskeep.github.io/keeproute/#faq

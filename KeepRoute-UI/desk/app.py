@@ -35,7 +35,8 @@ DESK_PORT = int(os.environ.get("OMNIROUTE_DESK_PORT", os.environ.get("ARIA_PORT"
 DESK_BIND = os.environ.get("OMNIROUTE_DESK_BIND", os.environ.get("ARIA_BIND", "0.0.0.0"))
 MISSION_CONTROLLER = os.environ.get("MISSION_CONTROLLER_URL", "http://127.0.0.1:20130").rstrip("/")
 ARIA_OWNS_AUTO_POLICY = False  # P1: Mission Controller owns Auto
-DEFAULT_OMNI = os.environ.get("OMNIROUTE_HOST", "http://127.0.0.1:20128").rstrip("/")
+# Host publish port from docker-compose.omniroute.yml (20127→container 20128).
+DEFAULT_OMNI = os.environ.get("OMNIROUTE_HOST", "http://127.0.0.1:20127").rstrip("/")
 LOCAL_LLM_MODEL = os.environ.get("ARIA_LOCAL_MODEL", "ollama-local/gpt-oss:20b")
 # Optional Premium Expansion ingest (route learning → world model → REX).
 # Empty = KeepRoute-only; set OTACON_EXPANSION_URL or vault expansion_url when Expansion is local.
@@ -120,9 +121,9 @@ AUTH_FIELDS = [
     {
         "id": "omniroute_url",
         "label": "OmniRoute URL",
-        "placeholder": "http://127.0.0.1:20128",
+        "placeholder": "http://127.0.0.1:20127",
         "secret": False,
-        "help": "Where OmniRoute lives on this computer. Leave the default if unsure.",
+        "help": "Where OmniRoute lives on this computer (KeepRoute compose: host 20127). Leave the default if unsure.",
     },
     {
         "id": "omniroute_api_key",
@@ -330,7 +331,7 @@ PROVIDER_GUIDES = [
         "summary": "This is the main switch. Without it, KeepRoute cannot auto-pick helpers.",
         "steps": [
             "Make sure OmniRoute is running on this computer.",
-            "Open OmniRoute in a browser (same computer, usually port 20128).",
+            "Open OmniRoute in a browser (same computer, usually port 20127).",
             "Find and copy the API key.",
             "Come back here → scroll to Keys → paste it into OmniRoute API key → Save keys.",
             "When the top of KeepRoute says OMNIROUTE ONLINE, you are ready for Auto.",
@@ -561,7 +562,7 @@ def _omni_host(vault: dict[str, str] | None = None) -> str:
     v = vault or _load_vault()
     host = (v.get("omniroute_url") or DEFAULT_OMNI).rstrip("/")
     if re.search(r"192\.168\.50\.(219|221)\b", host):
-        host = "http://127.0.0.1:20128"
+        host = "http://127.0.0.1:20127"
     return host
 
 
