@@ -37,6 +37,9 @@ MISSION_CONTROLLER = os.environ.get("MISSION_CONTROLLER_URL", "http://127.0.0.1:
 ARIA_OWNS_AUTO_POLICY = False  # P1: Mission Controller owns Auto
 DEFAULT_OMNI = os.environ.get("OMNIROUTE_HOST", "http://127.0.0.1:20128").rstrip("/")
 LOCAL_LLM_MODEL = os.environ.get("ARIA_LOCAL_MODEL", "ollama-local/gpt-oss:20b")
+# Optional Premium Expansion ingest (route learning → world model → REX).
+# Empty = KeepRoute-only; set OTACON_EXPANSION_URL or vault expansion_url when Expansion is local.
+DEFAULT_EXPANSION = (os.environ.get("OTACON_EXPANSION_URL") or "").rstrip("/")
 # OmniRoute auto/* currently prefers Grok on this host — KeepRoute Auto therefore
 # picks Local LLM for simple jobs and only escalates for hard/coding work.
 AUTO_MODEL = os.environ.get("ARIA_AUTO_MODEL", LOCAL_LLM_MODEL)
@@ -444,6 +447,55 @@ def _mask(value: str) -> str:
     return f"{v[:4]}…{v[-4:]}"
 
 
+def _expansion_base(vault: dict[str, str] | None = None) -> str:
+    vault = vault or _load_vault()
+    return (vault.get("expansion_url") or DEFAULT_EXPANSION or "").rstrip("/")
+
+
+def _notify_expansion_learning(
+    *,
+    prompt: str,
+    response: str = "",
+    agent: str = "",
+    model: str = "",
+    mission_id: str = "",
+    success: bool = True,
+    error: str = "",
+    source: str = "keeproute",
+    paid_or_local: str = "",
+    classification: str = "",
+) -> None:
+    """Fail-open POST into Premium Expansion route-learning ingest when configured."""
+    base = _expansion_base()
+    if not base or not (prompt or "").strip():
+        return
+    try:
+        payload = json.dumps(
+            {
+                "prompt": prompt,
+                "response": response or "",
+                "agent": agent or "",
+                "model": model or "",
+                "mission_id": mission_id or "",
+                "success": bool(success),
+                "error": error or "",
+                "source": source or "keeproute",
+                "paid_or_local": paid_or_local or "",
+                "classification": classification or "",
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{base}/api/expansion/route-learning/ingest",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            resp.read(256)
+    except Exception:
+        return
+
+
 def _load_vault() -> dict[str, str]:
     base = {
         "omniroute_url": DEFAULT_OMNI,
@@ -453,6 +505,7 @@ def _load_vault() -> dict[str, str]:
         "openai_api_key": "",
         "cursor_api_key": "",
         "xai_api_key": "",
+        "expansion_url": DEFAULT_EXPANSION,
     }
     if ENV_FILE.is_file():
         for line in ENV_FILE.read_text().splitlines():
@@ -481,6 +534,7 @@ def _load_vault() -> dict[str, str]:
         "openai_api_key": "OPENAI_API_KEY",
         "cursor_api_key": "CURSOR_API_KEY",
         "xai_api_key": "XAI_API_KEY",
+        "expansion_url": "OTACON_EXPANSION_URL",
     }
     for field, env_key in env_map.items():
         if os.environ.get(env_key):
@@ -779,6 +833,17 @@ def _run_omni_mission(mission_id: str, agent: str, prompt: str) -> None:
             mission["status"] = "ok"
             mission["exit_code"] = 0
             emit("sys", "MISSION COMPLETE · exit 0")
+            _notify_expansion_learning(
+                prompt=prompt,
+                response=str(data.get("reply") or ""),
+                agent=routed_agent,
+                model=str(data.get("actual_model") or ""),
+                mission_id=mission_id,
+                success=True,
+                source="keeproute-mission-controller",
+                paid_or_local=str(data.get("paid_or_local") or ""),
+                classification=str(dec.get("classification") or ""),
+            )
             return
 
         if not key:
@@ -845,17 +910,46 @@ def _run_omni_mission(mission_id: str, agent: str, prompt: str) -> None:
         mission["status"] = "ok"
         mission["exit_code"] = 0
         emit("sys", "MISSION COMPLETE · exit 0")
+        _notify_expansion_learning(
+            prompt=prompt,
+            response=text_out,
+            agent=routed_agent or agent,
+            model=str(routed_model or model),
+            mission_id=mission_id,
+            success=True,
+            source="keeproute-omniroute",
+        )
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")[:800]
         mission["status"] = "fail"
         mission["exit_code"] = e.code
         emit("err", f"OmniRoute HTTP {e.code}: {body}")
         emit("sys", "MISSION ABORTED")
+        _notify_expansion_learning(
+            prompt=prompt,
+            response="",
+            agent=agent,
+            model=model,
+            mission_id=mission_id,
+            success=False,
+            error=f"HTTP {e.code}: {body}",
+            source="keeproute-omniroute",
+        )
     except Exception as e:
         mission["status"] = "fail"
         mission["exit_code"] = 1
         emit("err", str(e))
         emit("sys", "MISSION ABORTED")
+        _notify_expansion_learning(
+            prompt=prompt,
+            response="",
+            agent=agent,
+            model=model,
+            mission_id=mission_id,
+            success=False,
+            error=str(e),
+            source="keeproute-omniroute",
+        )
     finally:
         q.put(None)
 
@@ -886,17 +980,37 @@ def _run_cli_mission(mission_id: str, agent: str, prompt: str) -> None:
         )
         mission["pid"] = proc.pid
         assert proc.stdout is not None
+        out_buf: list[str] = []
         for line in proc.stdout:
-            emit("out", line.rstrip("\n"))
+            text = line.rstrip("\n")
+            out_buf.append(text)
+            emit("out", text)
         code = proc.wait()
         mission["exit_code"] = code
         mission["status"] = "ok" if code == 0 else "fail"
         emit("sys", f"MISSION COMPLETE · exit {code}")
+        _notify_expansion_learning(
+            prompt=prompt,
+            response="\n".join(out_buf)[-12000:],
+            agent=agent,
+            mission_id=mission_id,
+            success=(code == 0),
+            error="" if code == 0 else f"cli exit {code}",
+            source="keeproute-cli",
+        )
     except Exception as e:
         mission["status"] = "fail"
         mission["exit_code"] = 1
         emit("err", str(e))
         emit("sys", "MISSION ABORTED")
+        _notify_expansion_learning(
+            prompt=prompt,
+            agent=agent,
+            mission_id=mission_id,
+            success=False,
+            error=str(e),
+            source="keeproute-cli",
+        )
     finally:
         q.put(None)
 

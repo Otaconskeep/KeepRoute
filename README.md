@@ -72,28 +72,35 @@ KeepRoute does **not** replace OmniRoute. KeepRoute is OtaconsKeep’s layer **o
 
 ---
 
-## Project REX · KeepRoute learning feed (operator Keep)
+## Project REX · KeepRoute learning feed
 
-**Is KeepRoute / OmniRoute driving or aiding Project REX?** On the **operator Keep**, both — verified by tracing the live path, not a diagram alone.
+**Is KeepRoute / OmniRoute driving or aiding Project REX?** **Both** — on the operator Keep and in **Otacon Expansion Premium v1.3.2+** (clean-room productization).
 
 | Step | What happens |
 |---|---|
 | 1 | KeepRoute / OmniRoute exchange completes (any supported provider, including local) |
-| 2 | Outcome can be recorded into a **shared learning pool** (global per Keep install) |
+| 2 | Outcome records into a **shared learning pool** (global per install) |
 | 3 | World-model rebuild surfaces risks / domain insights (e.g. `domain: keeproute`) |
-| 4 | REX governance treats `world_model:*` as a first-class proposal source on the same board pipeline |
+| 4 | REX treats `world_model:*` as a first-class proposal source on the same board pipeline |
 
-**Global, not local:** learning + world model are one shared pool tagged by domain — tags filter; they do not create per-session islands. Agents and REX draw from the same store.
+**Global, not local:** learning + world model are one shared pool tagged by domain — tags filter; they do not create per-session islands.
 
-### Public install honesty (verified 2026-09-22)
+### Wire KeepRoute → Expansion Premium
 
-| Capability | Operator Keep | Public KeepRoute 1.0 repo | Public Otacon Expansion / Premium |
+```bash
+export OTACON_EXPANSION_URL=http://127.0.0.1:<expansion-port>
+# or set vault field expansion_url
+```
+
+After each mission, KeepRoute fail-open POSTs to `/api/expansion/route-learning/ingest`. If Expansion is offline, missions still complete.
+
+| Capability | Operator Keep | Public KeepRoute 1.0 | Expansion Premium v1.3.2+ |
 |---|---|---|---|
-| Missions / OmniRoute | Yes | Yes | Via KeepRoute install |
-| Shared learning ← KeepRoute exchanges | Yes | **Not shipped** | Chat learning only |
-| World model → REX proposals | Yes | **No** | REX job-board stages only |
+| Missions / OmniRoute | Yes | Yes | Via KeepRoute |
+| Shared learning ← exchanges | Yes | Optional POST into Expansion | Yes (`route_learning`) |
+| World model → REX proposals | Yes | Via Expansion when wired | Yes (`world_model:*`) |
 
-Public KeepRoute remains mission orchestration (checkpoints, recovery, handoff). The learning → world-model → REX autonomy loop is **Keep-depth** until it is productized into a public package. Canonical write-up: [otaconskeep.github.io/keeproute/#rex-learning](https://otaconskeep.github.io/keeproute/#rex-learning).
+Canonical write-up: [otaconskeep.github.io/keeproute/#rex-learning](https://otaconskeep.github.io/keeproute/#rex-learning).
 
 ---
 
