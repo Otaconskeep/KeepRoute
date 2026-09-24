@@ -13,7 +13,7 @@
 
 [![KeepRoute Short](https://img.youtube.com/vi/Icc8LA7KIzA/hqdefault.jpg)](https://youtube.com/shorts/Icc8LA7KIzA)
 
-**[Watch the short](https://youtube.com/shorts/Icc8LA7KIzA)** · **[Canonical site](https://otaconskeep.github.io/keeproute/)** · **[Discord](https://discord.gg/cZDeqECzX)**
+**[Watch the short](https://youtube.com/shorts/Icc8LA7KIzA)** · **[Site](https://otaconskeep.github.io/keeproute/)** · **[Mirror](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/)** · **[Discord](https://discord.gg/cZDeqECzX)**
 
 ![KeepRoute UI tour](docs/assets/keeproute-ui-tour.gif)
 
@@ -342,7 +342,8 @@ KeepRoute/
 | | |
 |---|---|
 | This repo | https://github.com/Otaconskeep/KeepRoute |
-| Public page | https://otaconskeep.github.io/keeproute/ |
+| Site | https://otaconskeep.github.io/keeproute/ |
+| Mirror | https://otaconskeep-site.otaconskeep.workers.dev/keeproute/ |
 | YouTube Short | https://youtube.com/shorts/Icc8LA7KIzA |
 | OmniRoute upstream | https://github.com/diegosouzapw/OmniRoute |
 | Otacon Core | https://github.com/Otaconskeep/otacons-ai-ecosystem |
