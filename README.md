@@ -167,7 +167,7 @@ We do **not** claim stock OmniRoute is bad. Where stock has no mission-orchestra
 | Local-first trivial routing | Configurable routing | Policy-enforced local-first for trivial work |
 | Operational mission metrics / release gate | Gateway monitoring | Mission soak metrics + release verification |
 
-More visuals + UI screenshots: [keeproute/#compare](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#compare) · [keeproute/#ui](https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#ui)
+More visuals + UI screenshots: [keeproute/#compare](https://otaconskeep.github.io/keeproute/#compare) · [keeproute/#ui](https://otaconskeep.github.io/keeproute/#ui)
 
 ---
 
@@ -198,7 +198,7 @@ Mission complete
 Quick outline:
 
 1. **Requirements:** Linux (or Windows WSL2 Ubuntu), Python 3.10+, Docker, pip. GPU optional (Local AI).  
-2. **Get this package** — clone this repo or unzip from the [site download](https://otaconskeep-site.otaconskeep.workers.dev/downloads/KeepRoute-UI.zip).  
+2. **Get this package** — clone this repo or unzip from the [site download](https://otaconskeep.github.io/downloads/KeepRoute-UI.zip).  
 3. **Start OmniRoute** with Docker (`KeepRoute-UI/docker-compose.omniroute.yml`).  
 4. **Start KeepRoute UI** (`python3 desk/app.py` → `http://127.0.0.1:20129/`).  
 5. **Add providers / keys** inside the UI (never paste keys into Discord or GitHub).  
@@ -276,7 +276,7 @@ when using the compose file in this repo.
 **Friendly changelog:** First stable release of mission orchestration — persistent missions, checkpoints, recovery, local-first trivial policy, supported agent handoff, and release-verified soak results.
 
 Sanitized benchmarks, security notes, pros/cons, and limitations:  
-https://otaconskeep-site.otaconskeep.workers.dev/keeproute/#benchmarks
+https://otaconskeep.github.io/keeproute/#benchmarks
 
 ### Honest limits
 
@@ -342,7 +342,7 @@ KeepRoute/
 | | |
 |---|---|
 | This repo | https://github.com/Otaconskeep/KeepRoute |
-| Public page | https://otaconskeep-site.otaconskeep.workers.dev/keeproute/ |
+| Public page | https://otaconskeep.github.io/keeproute/ |
 | YouTube Short | https://youtube.com/shorts/Icc8LA7KIzA |
 | OmniRoute upstream | https://github.com/diegosouzapw/OmniRoute |
 | Otacon Core | https://github.com/Otaconskeep/otacons-ai-ecosystem |
